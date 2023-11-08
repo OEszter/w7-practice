@@ -1,50 +1,33 @@
 const rootElement = document.querySelector("#root")
 
+const api_key = "UrVEdu94RY5is7DgVnxOYNrv1PRPxXHMl9tyXdzh"
+
 const fetchUrl = async (url) => {
   const response = await fetch(url)
   return response.json()
 }
 
-const personComponent = (person) => `
-  <div class="person">
-    <h2>${person.name}</h2>
-    <h3>height: ${person.height} cm</h3>
-  </div>
+const apodComponent = (apodData) =>`
+<h2>${apodData.title}</h2>
+<h3>${apodData.date}</h3>
+<p>${apodData.explanation}</p>
+<img src=${apodData.url}>
 `
-
-const buttonComponent = (text, id) => `<button id=${id}>${text}</button>`
-
-const buttonEventComponent = (id, url, rootElement) => {
-  const buttonElement = document.querySelector(`#${id}`)
-  buttonElement.addEventListener("click", async () => {
-    rootElement.innerHTML = "LOADING..."
-
-    const newData = await fetchUrl(url)
-    makeDomFromData(newData, rootElement)
-  })
-}
-
-const makeDomFromData = (data, rootElement) => {
-  rootElement.innerHTML = ""
-
-  data.results.forEach((person) => {
-    rootElement.insertAdjacentHTML("beforeend", personComponent(person))
-  })
-
-  if (data.previous) {
-    rootElement.insertAdjacentHTML("beforeend", buttonComponent("previous", "prev"))
-    buttonEventComponent("prev", data.previous, rootElement)
-  }
-
-  if (data.next) {
-    rootElement.insertAdjacentHTML("beforeend", buttonComponent("next", "next"))
-    buttonEventComponent("next", data.next, rootElement)
-  }
-}
+//<input type="date" id="date"> az apodComponentbe tehető felülre pl.
 
 const init = async () => {
-  const data = await fetchUrl("https://swapi.dev/api/people/")
-  makeDomFromData(data, rootElement)
+  const data = await fetchUrl(`https://api.nasa.gov/planetary/apod?api_key=${api_key}`)
+  console.log(data)
+
+  //rootElement.innerHTML = `<h2>${data.title}</h2>`
+  rootElement.insertAdjacentHTML("beforeend", apodComponent(data))
+
+  const arrayData = await fetchUrl(`https://api.nasa.gov/planetary/apod?api_key=${api_key}&count=5`)
+  console.log(arrayData)
+
+  const dataByDate = await fetchUrl(`https://api.nasa.gov/planetary/apod?api_key=${api_key}&date=2010-10-10`)
+  console.log(dataByDate)
+
 }
 
 init()
